@@ -1,0 +1,44 @@
+.decl CEdge(x:number, y:number)
+.input CEdge
+
+.decl Def(x:number, v:symbol)
+.input Def
+
+.decl Use(x:number, v:symbol)
+.input Use
+
+.decl Kill(x:number, y:number)
+.input Kill
+
+.decl Source(x:number)
+.input Source
+
+.decl Sink(x:number)
+.input Sink
+
+.decl Sanitizer(x:number)
+.input Sanitizer
+
+.decl CPath(x:number, y:number)
+CPath(x, y) :- CEdge(x, y).
+CPath(x, z) :- CPath(x, y), CEdge(y, z).
+
+.decl In(x:number, y:number)
+In(z, y) :- Out(x, y), CEdge(x, z).
+
+.decl Out(x:number, y:number)
+Out(x, x) :- Def(x, _).
+Out(x, y) :- In(x, y), !Kill(x, y).
+
+.decl Edge(x:number, y:number)
+Edge(y, x) :- In(x, y), Use(x, v), Def(y, v).
+
+.decl Path(x:number, y:number)
+Path(x, y) :- Source(x), Edge(x, y).
+Path(x, z) :- Path(x, y), Edge(y, z), !Sanitizer(z).
+
+.decl Alarm(x:number, y:number)
+Alarm(x, y) :- Path(x, y), Sink(y).
+
+.output Alarm
+
